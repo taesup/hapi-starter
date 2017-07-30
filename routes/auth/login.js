@@ -23,7 +23,7 @@ module.exports = {
       // validate password
 
       return new Promise((resolve, reject) => {
-        request.server.app.cache.set('user:' + user.id, { account: user }, null, (err) => {
+        request.server.app.cache.set('user:' + user.id, { account: user }, 0, (err) => {
           if (err) { return reject(err); }
           request.cookieAuth.set({ sid: 'user:' + user.id });
           return resolve();

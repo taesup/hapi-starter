@@ -14,14 +14,13 @@ module.exports = {
     }
   },
   handler: (request, reply) => {
-    console.log(request.auth);
     if (request.auth.isAuthenticated) { return reply.redirect('/'); }
 
     let username = request.payload.username;
     let promise = request.models.User.create(request.payload)
     .then((user) => {
       return new Promise((resolve, reject) => {
-        request.server.app.cache.set('user:' + user.id, { account: user }, null, (err) => {
+        request.server.app.cache.set('user:' + user.id, { account: user }, 0, (err) => {
           if (err) { return reject(err); }
           request.cookieAuth.set({ sid: 'user:' + user.id });
           return resolve();
