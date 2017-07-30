@@ -9,6 +9,7 @@ module.exports = {
     }
   },
   handler: (request, reply) => {
-    return reply('test passed');
+    request.db.any('SELECT * FROM users')
+    .then((users) => { return reply('test passed'); });
   }
 }
