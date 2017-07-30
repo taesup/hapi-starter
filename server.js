@@ -1,34 +1,21 @@
 'use strict';
 
 const Hapi = require('hapi');
-const Inert = require('inert');
 const Good = require('good');
-
-const server = new Hapi.Server();
-const PORT = process.env.PORT || 9000;
-server.connection({ port: PORT, host: 'localhost' });
+const Inert = require('inert');
 
 const routes = require('./routes');
+const logOptions = require('./configs/logging');
+const PORT = process.env.PORT || 9000;
+
+
+const server = new Hapi.Server();
+server.connection({ port: PORT, host: 'localhost' });
 
 // static file serving
 server.register(Inert)
 // logging
-.then(() => {
-  return server.register({
-    register: Good,
-    options: {
-      reporters: {
-        console: [{
-          module: 'good-squeeze',
-          name: 'Squeeze',
-          args: [{ response: '*', log: '*' }]
-        },
-        { module: 'good-console' },
-        'stdout']
-      }
-    }
-  });
-})
+.then(() => { return server.register({ register: Good, options: logOptions }); })
 // routes (must come after inert)
 .then(() => { return server.route(routes); })
 // start server
