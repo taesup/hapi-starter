@@ -11,19 +11,25 @@ module.exports = class User {
   }
 
   // find a way to make this static
-  find(id) {
+  static find(id) {
     let q = 'SELECT id, username, created_at, updated_at FROM users WHERE id = $1';
     return db.any(q, [id])
     .then((users) => { if (users.length) { return new User(users[0]); } });
   }
 
+  static findUsername(username) {
+    let q = 'SELECT id, username, created_at, updated_at FROM users WHERE username = $1';
+    return db.any(q, [username])
+    .then((users) => { if (users.length) { return new User(users[0]); } });
+  }
+
   // find a way to make this static
-  create(user) {
+  static create(user) {
     // TODO: hash password with bcrypt
-    let q = 'INSERT INTO users (username, password, created_at) VALUES ($1, $2, now() RETURNING id';
+    let q = 'INSERT INTO users (username, password, created_at) VALUES ($1, $2, now()) RETURNING id';
     return db.any(q, [user.username, user.password])
     .then((newUser) => {
-      user.id = newUser.id;
+      user.id = newUser[0].id;
       delete user.password;
       return new User(user);
     });

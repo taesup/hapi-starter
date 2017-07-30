@@ -1,9 +1,9 @@
-'use strict';
 const PORT = process.env.PORT || 9000;
 
 const Hapi = require('hapi');
 const Good = require('good');
 const Inert = require('inert');
+const Auth = require('hapi-auth-cookie');
 
 const db = require('./database');
 const routes = require('./routes');
@@ -21,6 +21,29 @@ server.register(Inert)
 .then(() => { return server.decorate('request', 'db', db); })
 // models decoration
 .then(() => { return server.decorate('request', 'models', models); })
+// session caching (30 days)
+// TODO: double check cache expiresIn
+.then(() => { server.app.cache = server.cache({ segment: 'sessions', expiresIn: 2147483647 }); })
+// auth strategy
+.then(() => {
+  return server.register({ register: Auth })
+  .then(() => {
+    const cache = server.app.cache;
+    server.auth.strategy('session', 'cookie', true, {
+      password: 'password-should-be-32-characters',
+      cookie: 'hapi-starter',
+      // redirectTo: '/login',
+      isSecure: false, // TODO: set this to true on PROD
+      validateFunc: function (request, session, callback) {
+        cache.get(session.sid, (err, cached) => {
+          if (err) { return callback(err, false); }
+          if (!cached) { return callback(null, false); }
+          return callback(null, true, cached.account);
+        });
+      }
+    });
+  });
+})
 // routes (must come after inert)
 .then(() => { return server.route(routes); })
 // start server
@@ -32,7 +55,4 @@ server.register(Inert)
 
 // TODO list:
 // log to file
-// user auth (cookie)
-// login, logout, register
-// user auth restricted routes
 // templating (handlebars)

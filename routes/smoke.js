@@ -4,6 +4,7 @@ module.exports = {
   method: 'GET',
   path: '/smoke/{name}',
   config: {
+    auth: false,
     validate: {
       params: { name: Joi.string().required() }
     }

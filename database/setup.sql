@@ -10,3 +10,5 @@ CREATE TABLE users(
   created_at timestamp with time zone NOT NULL,
   updated_at timestamp with time zone
 );
+
+CREATE UNIQUE INDEX users_username_idx ON users (username);
