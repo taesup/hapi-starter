@@ -6,3 +6,12 @@ or not.
 
 
 whatever.
+
+
+## Dependencies
+ * Postgres for all your data storing needs
+ * ... node?
+ * I think that's it.
+
+
+I don't do tests.
