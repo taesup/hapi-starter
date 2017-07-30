@@ -1,5 +1,6 @@
 const PORT = process.env.PORT || 9000;
 
+const path = require('path');
 const Hapi = require('hapi');
 const Good = require('good');
 const Inert = require('inert');
@@ -11,7 +12,7 @@ const models = require('./models');
 const logOptions = require('./configs/logging');
 
 const server = new Hapi.Server();
-server.connection({ port: PORT, host: 'localhost' });
+server.connection({ port: PORT, host: 'localhost', routes: { files: { relativeTo: path.join(__dirname, 'public')}}});
 
 // static file serving
 server.register(Inert)
@@ -56,6 +57,7 @@ server.register(Inert)
 .catch((err) => { throw err; });
 
 // TODO list:
+// UUIDs for model ids
 // redis integration
 // log to file
 // templating (handlebars)
