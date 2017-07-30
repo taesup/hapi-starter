@@ -20,7 +20,7 @@ module.exports = class User {
   // find a way to make this static
   create(user) {
     // TODO: hash password with bcrypt
-    let q = 'INSERT INTO users (username, password, created_at, updated_at) VALUES ($1, $2, now(), now()) RETURNING id';
+    let q = 'INSERT INTO users (username, password, created_at) VALUES ($1, $2, now() RETURNING id';
     return db.any(q, [user.username, user.password])
     .then((newUser) => {
       user.id = newUser.id;
