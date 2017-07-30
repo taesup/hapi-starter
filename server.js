@@ -3,8 +3,8 @@
 const Hapi = require('hapi');
 const Inert = require('inert');
 const Good = require('good');
-const server = new Hapi.Server();
 
+const server = new Hapi.Server();
 const PORT = process.env.PORT || 9000;
 server.connection({ port: PORT, host: 'localhost' });
 
