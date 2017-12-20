@@ -10,7 +10,7 @@ module.exports = {
     }
   },
   handler: (request, reply) => {
-    request.db.any('SELECT * FROM users')
+    request.db.select('*').from('users')
     .then((users) => { return reply('test passed'); });
   }
 }

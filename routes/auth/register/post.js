@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const Boom = require('boom');
+const bcrypt = require('bcrypt');
 
 module.exports = {
   method: 'POST',
@@ -17,10 +18,19 @@ module.exports = {
     if (request.auth.isAuthenticated) { return reply.redirect('/'); }
 
     let username = request.payload.username;
-    let promise = request.models.User.create(request.payload)
+    let password = bcrypt.hashSync(request.payload.password, 15);
+
+    let promise = request.db('users').insert({
+      username: username,
+      password: password
+    }).returning('*')
     .then((user) => {
+      user = user[0];
+      console.log(user);
+
+      let cachedUser = { username: username };
       return new Promise((resolve, reject) => {
-        request.server.app.cache.set('user:' + user.id, { account: user }, 0, (err) => {
+        request.server.app.cache.set('user:' + user.id, cachedUser, 0, (err) => {
           if (err) { return reject(err); }
           request.cookieAuth.set({ sid: 'user:' + user.id });
           return resolve();

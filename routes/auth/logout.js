@@ -7,7 +7,6 @@ module.exports = {
     auth: { strategy: 'session', mode: 'try' }
   },
   handler: (request, reply) => {
-    console.log(request.auth);
     if (request.auth.isAuthenticated) { request.cookieAuth.clear(); }
     return reply.redirect('/');
   }
