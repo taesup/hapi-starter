@@ -3,6 +3,8 @@ const path = require('path');
 const Hapi = require('hapi');
 const Good = require('good');
 const Inert = require('inert');
+const Vision = require('vision');
+const Handlebars = require('handlebars');
 const Auth = require('hapi-auth-cookie');
 
 // local modules
@@ -17,6 +19,21 @@ server.connection({ port: config.port, host: 'localhost', routes: { files } });
 
 // static file serving
 server.register(Inert)
+.then(() => {
+  return server.register(Vision)
+  .then(() => {
+    server.views({
+        engines: { html: Handlebars },
+        relativeTo: __dirname,
+        path: './templates',
+        layout: true,
+        layoutPath: './templates/layout',
+        partialsPath: './templates/partials',
+        helpersPath: './templates/helpers',
+        isCached: false
+    });
+  })
+})
 // logging
 .then(() => { return server.register({ register: Good, options: config.logging }); })
 // db decoration

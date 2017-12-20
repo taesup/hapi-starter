@@ -1,4 +1,5 @@
 module.exports = [
+  require('./template'),
   require('./smoke'),
   require('./auth/login/post'),
   require('./auth/login/get'),
