@@ -14,17 +14,18 @@ const routes = require('./routes');
 const config = require('./configs');
 
 // bootstrap server
-const server = new Hapi.Server();
+const server = new Hapi.Server({
+  cache: {
+    name: 'catbox-redis',
+    engine: Redis,
+    partition: 'cache'
+  }
+});
 const files = { relativeTo: path.join(__dirname, 'public') }; // deliver files from public dir
 server.connection({
   port: config.port,
   host: config.address,
-  routes: { files },
-  cache: [{
-    engine: Redis,
-    host: '127.0.0.1',
-    partition: 'cache'
-  }]
+  routes: { files }
 });
 
 // static file serving
