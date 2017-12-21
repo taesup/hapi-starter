@@ -4,6 +4,7 @@ const Hapi = require('hapi');
 const Good = require('good');
 const Inert = require('inert');
 const Vision = require('vision');
+const Redis = require('catbox-redis');
 const Handlebars = require('handlebars');
 const Auth = require('hapi-auth-cookie');
 
@@ -15,7 +16,17 @@ const config = require('./configs');
 // bootstrap server
 const server = new Hapi.Server();
 const files = { relativeTo: path.join(__dirname, 'public') }; // deliver files from public dir
-server.connection({ port: config.port, host: 'localhost', routes: { files } });
+server.connection({
+  port: config.port,
+  host: config.address,
+  routes: { files } },
+  cache: [{
+    engine: Redis,
+    host: '127.0.0.1',
+    partition: 'cache'
+  }]
+
+);
 
 // static file serving
 server.register(Inert)
