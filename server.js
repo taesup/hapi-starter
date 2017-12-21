@@ -19,14 +19,13 @@ const files = { relativeTo: path.join(__dirname, 'public') }; // deliver files f
 server.connection({
   port: config.port,
   host: config.address,
-  routes: { files } },
+  routes: { files },
   cache: [{
     engine: Redis,
     host: '127.0.0.1',
     partition: 'cache'
   }]
-
-);
+});
 
 // static file serving
 server.register(Inert)
@@ -65,8 +64,3 @@ server.register(Inert)
 .then(() => { console.log(`Server running at: ${server.info.uri}`); })
 // catch all error handling
 .catch((err) => { throw err; });
-
-// TODO list:
-// UUIDs for model ids
-// redis integration
-// templating (handlebars)
