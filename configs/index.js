@@ -47,18 +47,21 @@ config.auth = function (server) {
   const cache = server.app.cache;
   server.auth.strategy('session', 'cookie', {
     password: 'password-should-be-32-characters',
-    cookie: 'cypherpunk-session',
+    cookie: 'user-session',
     ttl: 2147483647,
     keepAlive: true,
     clearInvalid: true,
     isSameSite: false, // TODO: set this to true on PROD
     isSecure: false, // TODO: set this to true on PROD
-    validateFunc: function (request, session, callback) {
-      cache.get(session.sid, (err, cached) => {
-        if (err) { return callback(err, false); }
-        if (!cached) { return callback(null, false); }
-        return callback(null, true, cached.account);
-      });
+    validateFunc: async function (request, session) {
+      const out = { valid: false };
+      try {
+        const cached = await cache.get(session.sid);
+        out.valid = !!cached;
+        if (out.valid) { out.credentials = cached; }
+      }
+      catch (err) { out.valid = false; }
+      return out;
     }
   });
   server.auth.default('session');

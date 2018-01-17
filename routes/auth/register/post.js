@@ -14,33 +14,26 @@ module.exports = {
       }
     }
   },
-  handler: (request, reply) => {
-    if (request.auth.isAuthenticated) { return reply.redirect('/'); }
+  handler: async (request, h) => {
+    if (request.auth.isAuthenticated) { return h.redirect('/'); }
 
     let username = request.payload.username;
     let password = bcrypt.hashSync(request.payload.password, 15);
 
-    let promise = request.db('users').insert({
+    let user = await request.db('users').insert({
       username: username,
       password: password
-    }).returning('*')
-    .then((user) => {
-      user = user[0];
-      console.log(user);
+    }).returning('*');
 
-      let cachedUser = { username: username };
-      return new Promise((resolve, reject) => {
-        request.server.app.cache.set('user:' + user.id, cachedUser, 0, (err) => {
-          if (err) { return reject(err); }
-          request.cookieAuth.set({ sid: 'user:' + user.id });
-          return resolve();
-        });
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      return Boom.badImplementation();
-    });
-    return reply(promise);
+    // set user to first array index
+    user = user[0];
+
+    // create user sessoin
+    let cachedUser = { username: username };
+    await request.server.app.cache.set('user:' + user.id, cachedUser, 0);
+    request.cookieAuth.set({ sid: 'user:' + user.id });
+
+    // return status 200 okay
+    return h.response().code(200);
   }
 }

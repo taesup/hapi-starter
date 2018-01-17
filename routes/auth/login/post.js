@@ -14,31 +14,26 @@ module.exports = {
       }
     }
   },
-  handler: (request, reply) => {
-    if (request.auth.isAuthenticated) { return reply.redirect('/'); }
+  handler: async (request, h) => {
+    if (request.auth.isAuthenticated) { return h.redirect('/'); }
 
     let username = request.payload.username;
     let password = request.payload.password;
 
-    let promise = request.db.select('*').from('users').where({ username: username }).first()
-    .then((user) => {
-      console.log(user);
+    // get user from db
+    let user = await request.db.select('*').from('users').where({ username: username }).first()
 
-      // validate password
-      if (!bcrypt.compareSync(password, user.password)) {
-        return Boom.badRequest('Invalid Credentials');
-      }
+    // validate password
+    if (!bcrypt.compareSync(password, user.password)) {
+      return Boom.badRequest('Invalid Credentials');
+    }
 
-      let cachedUser = { username: username };
-      return new Promise((resolve, reject) => {
-        request.server.app.cache.set('user:' + user.id, cachedUser, 0, (err) => {
-          if (err) { return reject(err); }
-          request.cookieAuth.set({ sid: 'user:' + user.id });
-          return resolve();
-        });
-      });
-    })
-    .catch((err) => { return err; });
-    return reply(promise);
+    // create session for user
+    let cachedUser = { username: username };
+    await request.server.app.cache.set('user:' + user.id, cachedUser, 0);
+    request.cookieAuth.set({ sid: 'user:' + user.id });
+
+    // return status 200 okay
+    return h.response().code(200);
   }
 }

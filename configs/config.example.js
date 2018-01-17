@@ -33,7 +33,7 @@ module.exports = {
       },
       {
         module: 'good-file',
-        args: ['./logs/cypher-log']
+        args: ['./logs/server-log']
       }]
     }
   },

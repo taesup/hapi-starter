@@ -6,8 +6,8 @@ module.exports = {
   config: {
     auth: { strategy: 'session', mode: 'try' }
   },
-  handler: (request, reply) => {
+  handler: async (request, h) => {
     if (request.auth.isAuthenticated) { request.cookieAuth.clear(); }
-    return reply.redirect('/');
+    return h.redirect('/');
   }
 }

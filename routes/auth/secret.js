@@ -6,7 +6,7 @@ module.exports = {
   config: {
     auth: { mode: 'required' }
   },
-  handler: (request, reply) => {
-    return reply('This is a secret');
+  handler: async (request, h) => {
+    return h.response('This is a secret');
   }
 }

@@ -4,8 +4,8 @@ module.exports = {
   method: 'GET',
   path: '/template',
   config: { auth: false },
-  handler: (request, reply) => {
+  handler: async (request, h) => {
     /// pass in other layouts using { layout: 'layoutName' } as third parameter
-    return reply.view('test', { title: 'test title' });
+    return h.view('test', { title: 'test title' });
   }
 }

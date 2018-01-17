@@ -9,8 +9,11 @@ module.exports = {
       params: { name: Joi.string().required() }
     }
   },
-  handler: (request, reply) => {
-    request.db.select('*').from('users')
-    .then((users) => { return reply('test passed'); });
+  handler: async (request, h) => {
+    try {
+      await request.db.select('*').from('users');
+      return h.response('test passed');
+    }
+    catch(err) { return Boom.badImplementation(); }
   }
 }
